@@ -20,16 +20,21 @@ var flowfield = []; //generating an array to store each vector of the flowfield
 
 var volume, fontScale; //variable to store volume's level
 
+var x, y, r, mySong, adieu, globe, fede1, fede2, stato;
+
 function preload() {
   //loading audio file
   mySong = loadSound("./assets/TG1_new.mp3");
   //loading fontfile
   adieu = loadFont('assets/Adieu-Bold.otf');
+
+  fede1 = loadImage('assets/download.jpg');
+  fede2 = loadSound("./assets/fede2.mp3");
 }
 
 function setup() {
   //creating a fullscreen canvas
-  let cnv = createCanvas(windowWidth, windowHeight);
+  var cnv = createCanvas(windowWidth, windowHeight);
   //calling togglePlay function on click wherever on the page
   cnv.mouseClicked(togglePlay);
 
@@ -52,67 +57,92 @@ function setup() {
 
   //general background blue
   background('rgb(18, 26, 140)');
+
+  stato = 0;
 }
 
 function draw() {
-  //getting volume level
-  volume = analyzer.getLevel();
+  //checking if the status variable is set on default
+  if (stato == 0) {
+    //getting volume level
+    volume = analyzer.getLevel();
 
-  fontScale = map(volume, 0, 0.2, 0, 720);
+    fontScale = map(volume, 0, 0.2, 0, 720);
 
-  //updating a semitransparent background for a trail effect
-  background('rgba(18, 26, 140, 0.05)');
+    //updating a semitransparent background for a trail effect
+    background('rgba(18, 26, 140, 0.05)');
 
-  //generating the tile
-  push();
-  stroke(255);
-  strokeWeight(1);
-  fill(255);
-  textSize(120+fontScale);
-  textFont(adieu);
-  textAlign(CENTER, CENTER);
-  var t = "TG1"; //content of the string
-  text(t, width / 2, height / 2);
-  pop();
+    //generating the tile
+    push();
+    stroke(255);
+    strokeWeight(1);
+    fill(255);
+    textSize(120 + fontScale);
+    textFont(adieu);
+    textAlign(CENTER, CENTER);
+    var t = "TG1"; //content of the string
+    text(t, width / 2, height / 2 - 20);
+    pop();
 
-  //initializing Yoffset eachtime at the beginning of the row
-  var yoff = 0;
-  //through 2 cycles passing each cell of the grid
-  for (var y = 0; y < rows; y++) {
-    //initializing Xoffset eachtime at the beginning of the column
-    var xoff = 0;
-    for (var x = 0; x < cols; x++) {
-      //getting the sequencial index of the cells
-      var index = x + y * cols;
+    //generating the instructions
+    push();
+    noStroke();
+    fill(255);
+    textSize(32);
+    textFont(adieu);
+    textAlign(CENTER, CENTER);
+    var t = "CLICK TO TOGGLE THE NEWS fLOW \n PRESS R TO RELOAD"; //content of the string
+    text(t, width / 2, height / 13);
+    pop();
 
-      //defining a random angle based on the Perlin noise
-      var angle = noise(xoff, yoff, zoff) * TWO_PI * 4;
+    push();
+    translate(width / 2, height / 2);
+    rotate(frameCount);
+    r = 200 + fontScale;
+    x = r * cos(frameCount / 2); //Definizone ascisse punto mobile
+    y = r * sin(frameCount / 2); //Definizione ordinete punto mobile
+    ellipse(x, y, 25);
+    pop();
 
-      //generating the vector in thedirection of the angle
-      var v = p5.Vector.fromAngle(angle);
-      v.setMag(1); //setting the magnitude to 1 to limit speed
-      //pushing the vector into the array
-      flowfield[index] = v;
-      xoff += inc; //incrementing the offset
+    //initializing Yoffset eachtime at the beginning of the row
+    var yoff = 0;
+    //through 2 cycles passing each cell of the grid
+    for (var y = 0; y < rows; y++) {
+      //initializing Xoffset eachtime at the beginning of the column
+      var xoff = 0;
+      for (var x = 0; x < cols; x++) {
+        //getting the sequencial index of the cells
+        var index = x + y * cols;
+
+        //defining a random angle based on the Perlin noise
+        var angle = noise(xoff, yoff, zoff) * TWO_PI * 4;
+
+        //generating the vector in thedirection of the angle
+        var v = p5.Vector.fromAngle(angle);
+        v.setMag(1); //setting the magnitude to 1 to limit speed
+        //pushing the vector into the array
+        flowfield[index] = v;
+        xoff += inc; //incrementing the offset
+      }
+      yoff += inc; //incrementing the offset
     }
-    yoff += inc; //incrementing the offset
-  }
-  zoff += 0.003; //incrementing the offset
+    zoff += 0.003; //incrementing the offset
 
-  // var volume = 0;
-  // volume = analyzer.getLevel();
-  // volume = map(volume,0,1,0,height);
+    // var volume = 0;
+    // volume = analyzer.getLevel();
+    // volume = map(volume,0,1,0,height);
 
-  for (var i = 0; i < particles.length; i++) {
-    //updating the particle to follow the flow of the vectors generated above
-    particles[i].follow(flowfield);
-    //updating particle position
-    particles[i].update();
-    //create seamless movement when eventually reaching the edges
-    particles[i].edges();
-    //show the updated particle
-    particles[i].show();
-  }
+    for (var i = 0; i < particles.length; i++) {
+      //updating the particle to follow the flow of the vectors generated above
+      particles[i].follow(flowfield);
+      //updating particle position
+      particles[i].update();
+      //create seamless movement when eventually reaching the edges
+      particles[i].edges();
+      //show the updated particle
+      particles[i].show();
+    }
+  } else if (stato == 1) easterEgg(); //if state variable is set to 1 the FedeEasterEgg starts
 }
 
 function windowResized() {
@@ -127,12 +157,11 @@ togglePlay = function() {
   } else {
     //looping sound when it ends
     mySong.loop();
-    print("BARRIO");
+    print("stream Cheyenne!");
   }
 }
 
 //defining a Particle object to generate the dynamic background
-
 function Particle() {
   //setting physics through position, velocity and acceleration
   this.pos = createVector(random(width), random(height));
@@ -202,4 +231,27 @@ function Particle() {
       this.updatePrev();
     }
   }
+}
+
+easterEgg = function() {
+  noLoop();
+  clear();
+  background(0);
+  mySong.stop();
+  image(fede1, (width - fede1.width) / 2, (height - fede1.height) / 2, fede1.width, fede2.height);
+  fede2.play();
+  noStroke();
+  fill(255);
+  textSize(32);
+  textFont(adieu);
+  textAlign(CENTER, CENTER);
+  var t = "PRESS R TO RELOAD"; //content of the string
+  text(t, width / 2, height / 2 + 200);
+}
+
+function keyPressed() {
+  //if R is pressed the page is reloaded
+  if (keyCode === 82) window.location.reload();
+  //if F is pressed the status changes to star the FedeEasterEgg
+  else if (keyCode === 70) stato = 1;
 }
