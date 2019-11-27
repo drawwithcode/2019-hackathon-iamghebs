@@ -26,9 +26,9 @@ function preload() {
   //loading audio file
   mySong = loadSound("./assets/TG1_new.mp3");
   //loading fontfile
-  adieu = loadFont('assets/Adieu-Bold.otf');
+  adieu = loadFont('./assets/Adieu-Bold.otf');
 
-  fede1 = loadImage('assets/download.jpg');
+  fede1 = loadImage('./assets/download.jpg');
   fede2 = loadSound("./assets/fede2.mp3");
 }
 
@@ -38,8 +38,7 @@ function setup() {
   //calling togglePlay function on click wherever on the page
   cnv.mouseClicked(togglePlay);
 
-  //setting audio FTT
-  fft = new p5.FFT();
+  //setting audio analyzer
   mySong.amp(0.2);
   analyzer = new p5.Amplitude();
   analyzer.setInput(mySong);
@@ -58,6 +57,7 @@ function setup() {
   //general background blue
   background('rgb(18, 26, 140)');
 
+  //defining a default state
   stato = 0;
 }
 
@@ -74,8 +74,7 @@ function draw() {
 
     //generating the tile
     push();
-    stroke(255);
-    strokeWeight(1);
+    noStroke();
     fill(255);
     textSize(120 + fontScale);
     textFont(adieu);
@@ -93,18 +92,21 @@ function draw() {
     textAlign(CENTER, CENTER);
     var t = "CLICK TO TOGGLE THE NEWS fLOW \n PRESS R TO RELOAD"; //content of the string
     text(t, width / 2, height / 13);
+    textSize(18);
+    text("FIND THE EASTER EGG!", width / 2, 2 * height / 13);
     pop();
 
+    //creating a ellipse rotating ellipse aroud the title
     push();
     translate(width / 2, height / 2);
     rotate(frameCount);
     r = 200 + fontScale;
-    x = r * cos(frameCount / 2); //Definizone ascisse punto mobile
-    y = r * sin(frameCount / 2); //Definizione ordinete punto mobile
+    x = r * cos(frameCount / 2);
+    y = r * sin(frameCount / 2);
     ellipse(x, y, 25);
     pop();
 
-    //initializing Yoffset eachtime at the beginning of the row
+    //initializing Yoffset everytime at the beginning of the row
     var yoff = 0;
     //through 2 cycles passing each cell of the grid
     for (var y = 0; y < rows; y++) {
